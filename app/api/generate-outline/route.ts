@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     return new Response(
       JSON.stringify({
         success: true,
-        content: text
+        outline: text
       }),
       { status: 200 }
     );
