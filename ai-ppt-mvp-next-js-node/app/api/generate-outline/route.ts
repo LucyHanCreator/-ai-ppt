@@ -1,8 +1,9 @@
-export const maxDuration = 60; // 最大60秒（防止被提前杀掉）
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    const { topic } = await req.json();
+    const body = await req.json();
+    const topic = body?.topic || "默认主题";
 
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // ⚡ 快模型（关键）
+        model: "gpt-4o-mini",
         input: `
 请生成一个简洁的PPT大纲：
 
@@ -23,28 +24,30 @@ export async function POST(req: Request) {
    标题：
    描述：
 3. 每页描述不超过20字
-4. 不要长段落
-5. 输出简洁清晰
+4. 输出简洁
         `
       })
     });
 
     const data = await response.json();
 
-    return new Response(JSON.stringify({
-      success: true,
-      content: data.output[0].content[0].text
-    }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    const text =
+      data?.output?.[0]?.content?.[0]?.text || "生成失败";
 
-  } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        content: text
+      }),
+      { status: 200 }
+    );
+  } catch (error: any) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message
+      }),
+      { status: 500 }
+    );
   }
 }
