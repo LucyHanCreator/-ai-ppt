@@ -1,6 +1,6 @@
 export const maxDuration = 60; // 最大60秒（防止被提前杀掉）
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const { topic } = await req.json();
 
